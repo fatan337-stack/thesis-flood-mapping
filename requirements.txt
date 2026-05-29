@@ -1,0 +1,20 @@
+# Geospatial Python project — data preparation notebook
+# These packages are pre-installed in Google Colab.
+# Versions listed below are tested combinations; newer compatible
+# versions should also work.
+
+folium>=0.14
+geopandas>=0.13
+ipywidgets>=8.0
+matplotlib>=3.7
+numpy>=1.24
+pandas>=2.0
+pyproj>=3.5
+rasterio>=1.3
+shapely>=2.0
+
+# Notes:
+# - `google.colab` is provided by the Colab environment and cannot
+#   be installed via pip. If running locally, replace the
+#   `drive.mount` cell with a local path configuration.
+# - IPython is bundled with Jupyter/Colab.
