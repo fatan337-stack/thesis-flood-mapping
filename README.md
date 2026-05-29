@@ -60,10 +60,6 @@ This notebook was also submitted as the project work for **Geospatial Python (GM
 - Raster analysis (clipping, normalization, tiling)
 - Creation of interactive maps
 
-## LLM usage declaration
-
-The Claude AI assistant (Anthropic) was used to help with the path configuration setup and to write this README. All code logic and the analytical pipeline are my own work. I reviewed and understood the assistant's suggestions before incorporating them.
-
 ## License
 
 MIT License — see `LICENSE` for details.
