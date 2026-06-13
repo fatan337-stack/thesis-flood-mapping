@@ -1,8 +1,8 @@
 # Flood Mapping with Sentinel-1 SAR Data
 
-Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning–based flood extent mapping. Part of a degree project at Karlstad University (Surveying and Geographical IT).
+Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning based flood extent mapping, and for running and evaluating flood inference with a pretrained U-Net. Part of a degree project at Karlstad University (Surveying and Geographical IT).
 
-This repository will grow into the full pipeline used in the thesis. Currently it contains the **data preparation** notebook; additional notebooks (Random Forest, Otsu thresholding, U-Net inference, and evaluation) will be added after the thesis is finalized.
+This repository contains the data preparation and U-Net inference notebooks. The remaining notebooks (Random Forest, Otsu thresholding, and evaluation) will be added shortly.
 
 ## Project context
 
@@ -16,27 +16,44 @@ Prepares a Sentinel-1 scene and the corresponding Copernicus EMS reference vecto
 
 Key steps:
 
-1. **Interactive file selection** — Google Drive scanning with `ipywidgets`
-2. **Vector processing** — parsing EMS shapefiles with `geopandas`, building exclusion masks from AOI and permanent water polygons
-3. **Coordinate transformations** — reprojection between WGS84 and the Sentinel-1 scene's native UTM CRS using `pyproj`
-4. **Raster operations** — AOI-based clipping, dB normalization (−30 to 10 dB → 0–1), and rasterization of EMS vectors to match the SAR grid
-5. **Tile extraction** — generation of 128×128 GeoTIFF tiles matching the STURM-Flood input format
-6. **Visualization** — interactive `folium` map of tile locations with ground truth water percentage overlay
+1. **Interactive file selection**: Google Drive scanning with `ipywidgets`
+2. **Vector processing**: parsing EMS shapefiles with `geopandas`, building exclusion masks from AOI and permanent water polygons
+3. **Coordinate transformations**: reprojection between WGS84 and the Sentinel-1 scene's native UTM CRS using `pyproj`
+4. **Raster operations**: AOI-based clipping, dB normalization (the -30 to 10 dB range mapped to 0 to 1), and rasterization of EMS vectors to match the SAR grid
+5. **Tile extraction**: generation of 128×128 GeoTIFF tiles matching the STURM-Flood input format
+6. **Visualization**: interactive `folium` map of tile locations with ground truth water percentage overlay
+
+### `02_unet_inference.ipynb`
+
+Runs flood extent inference with the pretrained STURM-Flood U-Net on the prepared Sentinel-1 tiles, computes pixel-wise evaluation metrics against the ground truth, and visualizes the predictions.
+
+Key steps:
+
+1. **Environment setup**: clones the STURM-Flood repository and installs dependencies
+2. **Configuration**: sensor selection, data source (upload or Google Drive), and study area
+3. **Model setup**: downloads the pretrained Sentinel-1 U-Net weights from Zenodo and rebuilds the model
+4. **Inference**: per-tile flood probability maps thresholded into binary water masks
+5. **Evaluation**: micro-averaged Precision, Recall, F1, IoU and accuracy, reported to match the STURM-Flood paper
+6. **Output**: binary and probability GeoTIFFs, comparison visualizations, and a per-tile metrics CSV
+
+This notebook is adapted from the STURM-Flood project's inference notebook. The U-Net architecture and the core inference, I/O and visualization functions are imported from the STURM-Flood repository, which is cloned at runtime, and are not redistributed here. See the License section below.
 
 ## Configuration
 
-The notebook expects data to live in your Google Drive. Mount your Drive in the first runnable cell, then set the `BASE` variable in the configuration cell to point to your project folder:
+`01_data_preparation.ipynb` expects data to live in your Google Drive. Mount your Drive in the first runnable cell, then set the `BASE` variable in the configuration cell to point to your project folder:
 
 ```python
 BASE = '/content/drive/MyDrive/Project_data_Stefan_Edvinsson'
 OUTPUT_DATASET_DIR = f'{BASE}/Dataset_goteborg'   # adjust for other study areas
 ```
 
-All other paths are built from `BASE`. To run the notebook with the shared data folder, add the folder as a shortcut to the root of your Google Drive (right-click the shared folder → 'Add shortcut to Drive' → 'My Drive'). The default `BASE` path then matches the shared folder's location and no changes are needed.
+All other paths are built from `BASE`. To run the notebook with the shared data folder, add the folder as a shortcut to the root of your Google Drive (right-click the shared folder, 'Add shortcut to Drive', 'My Drive'). The default `BASE` path then matches the shared folder's location and no changes are needed.
+
+`02_unet_inference.ipynb` has its own configuration cell for sensor selection, data source, and study area. Set these before running the rest of the notebook.
 
 ## Dependencies
 
-The notebook is designed to run in **Google Colab**, which already provides most of the required packages. For local execution, install the dependencies in `requirements.txt`:
+The notebooks are designed to run in **Google Colab**, which already provides most of the required packages. For local execution, install the dependencies in `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
@@ -44,15 +61,17 @@ pip install -r requirements.txt
 
 ## Data sources
 
-- **Sentinel-1 SAR** — Copernicus Data Space Ecosystem (https://dataspace.copernicus.eu)
-- **Reference data** — Copernicus Emergency Management Service, EMSR427 (https://emergency.copernicus.eu/mapping/list-of-components/EMSR427)
-- **STURM-Flood pre-trained model and dataset** — Zenodo (https://doi.org/10.5281/zenodo.12748982)
+- **Sentinel-1 SAR**: Copernicus Data Space Ecosystem (https://dataspace.copernicus.eu)
+- **Reference data**: Copernicus Emergency Management Service, EMSR427 (https://emergency.copernicus.eu/mapping/list-of-components/EMSR427)
+- **STURM-Flood dataset**: Zenodo (https://doi.org/10.5281/zenodo.12748982)
+- **STURM-Flood Sentinel-1 model weights**: Zenodo (https://doi.org/10.5281/zenodo.15189664)
+- **STURM-Flood code**: https://github.com/STURM-WEO/STURM-Flood
 
-Data is not included in this repository due to size constraints. The Sentinel-1 scenes must be preprocessed in SNAP (thermal noise removal, orbit file, calibration, terrain correction, speckle filtering, dB conversion) before being used as input to the notebook.
+Data is not included in this repository due to size constraints. The Sentinel-1 scenes must be preprocessed in SNAP (thermal noise removal, orbit file, calibration, terrain correction, speckle filtering, dB conversion) before being used as input to the notebooks.
 
 ## Course context
 
-This notebook was also submitted as the project work for **Geospatial Python (GMAF01)** at Karlstad University. It demonstrates several core learning outcomes of the course:
+`01_data_preparation.ipynb` was also submitted as the project work for **Geospatial Python (GMAF01)** at Karlstad University. It demonstrates several core learning outcomes of the course:
 
 - Use of multiple GIS libraries (`rasterio`, `geopandas`, `shapely`, `folium`, `pyproj`)
 - Modification and analysis of geometric objects
@@ -62,8 +81,16 @@ This notebook was also submitted as the project work for **Geospatial Python (GM
 
 ## License
 
-MIT License — see `LICENSE` for details.
+The notebooks authored for this project (`01_data_preparation.ipynb` and the upcoming Random Forest, Otsu, and evaluation notebooks) are released under the MIT License. See `LICENSE`.
+
+`02_unet_inference.ipynb` is an adaptation of the STURM-Flood project's inference notebook, which is licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/). As an adaptation of that work, this notebook is distributed under the same CC BY-SA 4.0 license. The STURM-Flood model code and weights are obtained from the STURM-Flood repository and Zenodo at runtime and are not redistributed here.
+
+## Citation
+
+This project uses the STURM-Flood dataset and inference code. If you build on this work, please also cite:
+
+Notarangelo, N. M., Wirion, C., & van Winsen, F. (2025). STURM-Flood: A curated dataset for deep learning-based flood extent mapping leveraging Sentinel-1 and Sentinel-2 imagery. Big Earth Data. https://doi.org/10.1080/20964471.2025.2458714
 
 ## Author
 
-Stefan Edvinsson — Karlstad University, 2026
+Stefan Edvinsson, Karlstad University, 2026
