@@ -2,7 +2,7 @@
 
 Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning based flood extent mapping, and for running and evaluating flood inference with a pretrained U-Net. Part of a degree project at Karlstad University (Surveying and Geographical IT).
 
-This repository contains the data preparation and U-Net inference notebooks. The remaining notebooks (Random Forest, Otsu thresholding, and evaluation) will be added shortly.
+This repository contains the data preparation, U-Net inference, and Random Forest notebooks. The remaining notebooks (Otsu thresholding and evaluation) will be added shortly.
 
 ## Project context
 
@@ -37,6 +37,21 @@ Key steps:
 6. **Output**: binary and probability GeoTIFFs, comparison visualizations, and a per-tile metrics CSV
 
 This notebook is adapted from the STURM-Flood project's inference notebook. The U-Net architecture and the core inference, I/O and visualization functions are imported from the STURM-Flood repository, which is cloned at runtime, and are not redistributed here. See the License section below.
+
+### `03_random_forest.ipynb`
+
+A two-stage Random Forest pipeline that serves as a machine learning baseline. The model is trained on STURM-Flood SAR tiles (VV and VH bands) and tested on the external EMSR427 areas.
+
+Key steps:
+
+1. **Configuration and data copy**: folder selection and copying tiles from Google Drive to local disk for faster reads
+2. **Event split**: an event-level 80/20 train and validation split on the STURM-Flood data, so no event appears in both sets
+3. **Tile percentage search**: a learning curve over the share of tiles used per event, evaluated on the validation split
+4. **Depth search**: a `max_depth` search at the chosen tile percentage, on the same validation split
+5. **Final model**: trained with the selected parameters and saved as a `.joblib` model plus a `.json` config
+6. **External test**: the final model is run on all three EMSR427 areas, writing per-tile metrics and binary GeoTIFF predictions named `RF_<tile>` for compatibility with the downstream TileExplorer notebook
+
+All model selection happens within the STURM-Flood data only. The external test areas are used solely for final evaluation, never for tuning.
 
 ## Configuration
 
@@ -81,7 +96,7 @@ Data is not included in this repository due to size constraints. The Sentinel-1 
 
 ## License
 
-The notebooks authored for this project (`01_data_preparation.ipynb` and the upcoming Random Forest, Otsu, and evaluation notebooks) are released under the MIT License. See `LICENSE`.
+The notebooks authored for this project (`01_data_preparation.ipynb`, `03_random_forest.ipynb`, and the upcoming Otsu and evaluation notebooks) are released under the MIT License. See `LICENSE`.
 
 `02_unet_inference.ipynb` is an adaptation of the STURM-Flood project's inference notebook, which is licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/). As an adaptation of that work, this notebook is distributed under the same CC BY-SA 4.0 license. The STURM-Flood model code and weights are obtained from the STURM-Flood repository and Zenodo at runtime and are not redistributed here.
 
