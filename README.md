@@ -2,7 +2,7 @@
 
 Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning based flood extent mapping, and for running and evaluating flood inference with a pretrained U-Net. Part of a degree project at Karlstad University (Surveying and Geographical IT).
 
-This repository contains the data preparation, U-Net inference, and Random Forest notebooks. The remaining notebooks (Otsu thresholding and evaluation) will be added shortly.
+This repository contains the full pipeline: data preparation, U-Net inference, Random Forest, Otsu thresholding, and a tile explorer for visual cross-method comparison.
 
 ## Project context
 
@@ -53,6 +53,30 @@ Key steps:
 
 All model selection happens within the STURM-Flood data only. The external test areas are used solely for final evaluation, never for tuning.
 
+### `04_otsu_threshold.ipynb`
+
+A per-tile Otsu thresholding baseline applied to the Sentinel-1 VV band, evaluated on the same test tiles as U-Net and Random Forest for direct comparison.
+
+Key steps:
+
+1. **Thresholding**: for each tile an optimal threshold is found automatically by maximizing inter-class variance (Otsu, 1979)
+2. **Tile filtering**: tiles with less than 1% ground truth water are excluded, consistent with the STURM-Flood dataset filtering
+3. **Evaluation**: per-tile and aggregate water-detection metrics against the ground truth
+4. **Output**: binary GeoTIFF predictions named `Otsu_<tile>` for use in the tile explorer
+
+### `05_tile_explorer.ipynb`
+
+An interactive tool for inspecting and comparing the three methods tile by tile, and for producing the comparison figures used in the thesis.
+
+Key features:
+
+1. **Interactive map**: a folium web map of all tiles, coloured by ground truth water percentage
+2. **Tile viewer**: Sentinel-1 VV and VH, an ortophoto basemap, ground truth, and per-method confusion maps (TP/FP/FN/TN)
+3. **Composite grid**: several tiles combined into a single figure for side-by-side comparison
+4. **Overview maps**: whole-area confusion maps mosaicking the predictions over an ESRI World Imagery basemap, with scalebar and north arrow
+
+Unlike the other notebooks, this one is designed to run **locally** (Anaconda or JupyterLab on Windows), not in Google Colab, since it reads many small tiles from local disk and uses an interactive widget interface. The prediction directories are configured as relative paths in the AREA_CONFIGS cell. The figure titles and legends in the overview maps are in Swedish, matching the thesis figures.
+
 ## Configuration
 
 `01_data_preparation.ipynb` expects data to live in your Google Drive. Mount your Drive in the first runnable cell, then set the `BASE` variable in the configuration cell to point to your project folder:
@@ -66,9 +90,11 @@ All other paths are built from `BASE`. To run the notebook with the shared data 
 
 `02_unet_inference.ipynb` has its own configuration cell for sensor selection, data source, and study area. Set these before running the rest of the notebook.
 
+`03_random_forest.ipynb` and `04_otsu_threshold.ipynb` each have a configuration cell with their own input and output paths. `05_tile_explorer.ipynb` runs locally and resolves its data through the relative directories listed in its AREA_CONFIGS cell.
+
 ## Dependencies
 
-The notebooks are designed to run in **Google Colab**, which already provides most of the required packages. For local execution, install the dependencies in `requirements.txt`:
+The notebooks 01 to 04 are designed to run in **Google Colab**, which already provides most of the required packages. `05_tile_explorer.ipynb` runs locally instead. For local execution of any notebook, install the dependencies in `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
@@ -96,7 +122,7 @@ Data is not included in this repository due to size constraints. The Sentinel-1 
 
 ## License
 
-The notebooks authored for this project (`01_data_preparation.ipynb`, `03_random_forest.ipynb`, and the upcoming Otsu and evaluation notebooks) are released under the MIT License. See `LICENSE`.
+The notebooks authored for this project (`01_data_preparation.ipynb`, `03_random_forest.ipynb`, `04_otsu_threshold.ipynb`, and `05_tile_explorer.ipynb`) are released under the MIT License. See `LICENSE`.
 
 `02_unet_inference.ipynb` is an adaptation of the STURM-Flood project's inference notebook, which is licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/). As an adaptation of that work, this notebook is distributed under the same CC BY-SA 4.0 license. The STURM-Flood model code and weights are obtained from the STURM-Flood repository and Zenodo at runtime and are not redistributed here.
 
