@@ -103,7 +103,7 @@ pip install -r requirements.txt
 ## Data sources
 
 - **Sentinel-1 SAR**: Copernicus Data Space Ecosystem (https://dataspace.copernicus.eu)
-- **Reference data**: Copernicus Emergency Management Service, EMSR427 (https://emergency.copernicus.eu/mapping/list-of-components/EMSR427)
+- **Reference data**: Copernicus Emergency Management Service, EMSR427 (https://mapping.emergency.copernicus.eu/activations/)
 - **STURM-Flood dataset**: Zenodo (https://doi.org/10.5281/zenodo.12748982)
 - **STURM-Flood Sentinel-1 model weights**: Zenodo (https://doi.org/10.5281/zenodo.15189664)
 - **STURM-Flood code**: https://github.com/STURM-WEO/STURM-Flood
