@@ -1,6 +1,6 @@
 # Flood Mapping with Sentinel-1 SAR Data
 
-Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning based flood extent mapping, and for running and evaluating flood inference with a pretrained U-Net. Part of a degree project at Karlstad University (Surveying and Geographical IT).
+Geospatial Python pipeline for preparing Sentinel-1 SAR data and Copernicus EMS reference data for deep learning based flood extent mapping, and for running and evaluating flood inference with a pretrained U-Net. Developed for a degree project in Surveying and Geographic Information Technology at Karlstad University.
 
 This repository contains the full pipeline: data preparation, U-Net inference, Random Forest, Otsu thresholding, and a tile explorer for visual cross-method comparison.
 
