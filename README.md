@@ -8,6 +8,10 @@ This repository contains the full pipeline: data preparation, U-Net inference, R
 
 The thesis evaluates the generalization capability of the pre-trained **STURM-Flood** U-Net model (Notarangelo et al., 2025) when applied to Swedish flood conditions. Three Copernicus EMSR427 areas (Storm Dennis, February 2020) are used as test sites: Karlstad, Göteborg, and Kristianstad.
 
+The full thesis, including methodology, results, and discussion, is openly
+available in DiVA (in Swedish, with an English abstract):
+[Read the thesis in DiVA](http://www.diva-portal.org/smash/record.jsf?pid=diva2:2076092)
+
 ## Notebook overview
 
 ### `01_data_preparation.ipynb`
